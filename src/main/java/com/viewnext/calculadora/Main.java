@@ -1,6 +1,11 @@
 package com.viewnext.calculadora;
 
+import java.lang.System.Logger;
 import java.util.Scanner;
+
+import com.viewnext.calculadora.operacion.Operacion;
+import com.sun.tools.sjavac.Log.Level;
+import com.viewnext.calculadora.operacion.Calculadora;
 
 public class Main {
 
@@ -15,18 +20,23 @@ public class Main {
 		}
 	}
 
-	public static void menuCalculadora() {
-		System.out.println("-----------------------------------------------------------------------");
-		System.out.println("\t1-Sumar\n" + "\t2-Restar\n" + "\t3-Dividir\n" + "\t4-Multiplicar\n" + "\t-1-Salir\n");
-		System.out.println("-----------------------------------------------------------------------");
+	public static void menuCalculadora(Logger logger) {
+		logger.log(System.Logger.Level.INFO, "-----------------------------------------------------------------------");
+		logger.log(System.Logger.Level.INFO, "\t1-Sumar\n" + "\t2-Restar\n" + "\t3-Dividir\n" + "\t4-Multiplicar\n" + "\t5-Historial\n"
+				+ "\t-1-Salir\n");
+		logger.log(System.Logger.Level.INFO, "-----------------------------------------------------------------------");
 	}
 
 	public static void main(String[] args) {
-		int opc, num1 = 1, num2 = 1;
-		float resultado = 0f;
+		Logger logger = System.getLogger("LogCalc");
+		Calculadora calculadora = new Calculadora();
+		int opc;
+		int num1 = 1;
+		int num2 = 1;
+		float resultado;
 		boolean salirPrograma = false;
 		do {
-			menuCalculadora();
+			menuCalculadora(logger);
 
 			// Pedir opcion
 			try {
@@ -35,46 +45,42 @@ public class Main {
 				opc = 0;
 			}
 
-			if (opc != -1) {
+			switch (opc) {
+			case 1:
+				resultado = calculadora.suma(num1, num2);
+				calculadora.addToHistorial(new Operacion(num1, num2, resultado, '+'));
+				break;
+				
+			case 2:
+				resultado = calculadora.resta(num1, num2);
+				calculadora.addToHistorial(new Operacion(num1, num2, resultado, '+'));
+				break;
+				
+			case 3:
+				resultado = calculadora.dividir(num1, num2);
+				calculadora.addToHistorial(new Operacion(num1, num2, resultado, '+'));
+				break;
+				
+			case 4:
+				resultado = calculadora.multiplicar(num1, num2);
+				calculadora.addToHistorial(new Operacion(num1, num2, resultado, '+'));
+				break;
+				
+			case 5:
+				System.out.println(calculadora.obtenerHistorial());
+				logger.log(System.Logger.Level.INFO, calculadora.obtenerHistorial());
+				break;
 
-				// Pedir numeros
-				try {
-					num1 = pedirInt();
-					num2 = pedirInt();
-				} catch (Exception e) {
-					opc = 0;
-				}
-
-				// Operaciones
-				if (opc == 1) {
-					resultado = Operaciones.suma(num1, num2);
-				}
-
-				if (opc == 2) {
-					resultado = Operaciones.resta(num1, num2);
-				}
-
-				if (opc == 3) {
-					try {
-						resultado = Operaciones.dividir(num1, num2);
-					} catch (IllegalArgumentException e) {
-						System.out.println("El divisor no puede ser 0");
-						opc = 0;
-					}
-				}
-
-				if (opc == 4) {
-					resultado = Operaciones.multiplicar(num1, num2);
-				}
-
-				if (opc != 0) {
-					System.out.println("El resultado de la operacion es: " + resultado);
-				}
-			}else{
+			case -1:
 				salirPrograma = true;
-			} 
+				break;
+				
+			default:
+				logger.log(System.Logger.Level.INFO, "Opcion no valida");
+				break;
+			}
 
-		}while(!salirPrograma);
-}
+		} while (!salirPrograma);
+	}
 
 }
